@@ -1,0 +1,11 @@
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: ikea-postgres
+    environment:
+      POSTGRES_DB: ikea
+      POSTGRES_USER: ikea
+      POSTGRES_PASSWORD: ikea
+    ports:
+      - "5432:5432"

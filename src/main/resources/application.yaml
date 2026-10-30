@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: Ikea
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ikea
+    username: ikea
+    password: ikea
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
