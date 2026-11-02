@@ -29,11 +29,6 @@ public class TestDataController {
         this.bomLineRepo = bomLineRepo;
     }
 
-    @GetMapping
-    public List<ItemResponseDto> getItems() {
-        return itemRepo.findAll().stream().map(ItemMapper::toDto).toList();
-    }
-
     @PostMapping
     public void createTestData() {
         // 1. Create items
@@ -45,7 +40,7 @@ public class TestDataController {
 
         // 2. Create BOM for leg assembly
         Bom legAssemblyBom = createBom(legAssembly);
-        createBomLine(legAssemblyBom, woodenLeg, 4);
+        createBomLine(legAssemblyBom, woodenLeg, 1);
         createBomLine(legAssemblyBom, screw, 4);
 
         // 3. Create BOM for desk
