@@ -14,4 +14,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(InsufficientQuantityException.class)
+   public ResponseEntity<String> handleInsufficientQuantityException(InsufficientQuantityException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }

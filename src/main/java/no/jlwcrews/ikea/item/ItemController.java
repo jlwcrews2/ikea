@@ -11,15 +11,13 @@ import java.util.Map;
 public class ItemController {
 
     private final ItemService itemService;
-    private final ItemRepo itemRepo;
 
-    public ItemController(ItemService itemService, ItemRepo itemRepo) {
+    public ItemController(ItemService itemService) {
         this.itemService = itemService;
-        this.itemRepo = itemRepo;
     }
 
     @GetMapping("/{id}/requirements")
-    public ResponseEntity<Map<String, Integer>> getRequirements(
+    public ResponseEntity<Map<Long, Integer>> getRequirements(
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int qty
     ){
@@ -29,7 +27,7 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<List<ItemResponseDto>> getItems() {
-        var itemList = itemRepo.findAll().stream().map(ItemMapper::toDto).toList();
+        var itemList = itemService.getAllItems().stream().map(ItemMapper::toDto).toList();
         return ResponseEntity.ok(itemList);
     }
 }

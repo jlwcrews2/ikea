@@ -4,16 +4,13 @@ import no.jlwcrews.ikea.bom.Bom;
 import no.jlwcrews.ikea.bom.BomRepo;
 import no.jlwcrews.ikea.bomline.BomLine;
 import no.jlwcrews.ikea.bomline.BomLineRepo;
+import no.jlwcrews.ikea.inventory.Inventory;
+import no.jlwcrews.ikea.inventory.InventoryRepo;
 import no.jlwcrews.ikea.item.Item;
-import no.jlwcrews.ikea.item.ItemMapper;
 import no.jlwcrews.ikea.item.ItemRepo;
-import no.jlwcrews.ikea.item.ItemResponseDto;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/testdata")
@@ -22,11 +19,13 @@ public class TestDataController {
     private final BomRepo bomRepo;
     private final ItemRepo itemRepo;
     private final BomLineRepo bomLineRepo;
+    private final InventoryRepo inventoryRepo;
 
-    public TestDataController(BomRepo bomRepo, ItemRepo itemRepo, BomLineRepo bomLineRepo) {
+    public TestDataController(BomRepo bomRepo, ItemRepo itemRepo, BomLineRepo bomLineRepo, InventoryRepo inventoryRepo) {
         this.bomRepo = bomRepo;
         this.itemRepo = itemRepo;
         this.bomLineRepo = bomLineRepo;
+        this.inventoryRepo = inventoryRepo;
     }
 
     @PostMapping
@@ -48,6 +47,12 @@ public class TestDataController {
         createBomLine(deskBom, tabletop, 1);
         createBomLine(deskBom, legAssembly, 4);
         createBomLine(deskBom, screw, 20);
+
+        createInventoryForItem(screw, 3000);
+        createInventoryForItem(woodenLeg, 97);
+        createInventoryForItem(tabletop, 1433);
+        createInventoryForItem(legAssembly, 85);
+        createInventoryForItem(desk, 102);
     }
 
     private Item createItem(String name, String description) {
@@ -70,5 +75,12 @@ public class TestDataController {
         line.setItem(item);
         line.setQuantity(quantity);
         bomLineRepo.save(line);
+    }
+
+    private void createInventoryForItem(Item item, int qty){
+        Inventory inventory = new Inventory();
+        inventory.setItem(item);
+        inventory.setQuantityOnHand(qty);
+        inventoryRepo.save(inventory);
     }
 }
