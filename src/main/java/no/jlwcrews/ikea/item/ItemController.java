@@ -21,7 +21,7 @@ public class ItemController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "1") int qty
     ){
-        var result = itemService.calculateRequirements(id, qty);
+        var result = itemService.calculateMaterialRequirements(id, qty);
         return ResponseEntity.ok(result);
     }
 

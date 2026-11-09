@@ -1,7 +1,9 @@
 package no.jlwcrews.ikea.inventory;
 
+import no.jlwcrews.ikea.bomline.BomLine;
 import no.jlwcrews.ikea.exception.InsufficientQuantityException;
 import no.jlwcrews.ikea.exception.ItemNotFoundException;
+import no.jlwcrews.ikea.item.Item;
 import no.jlwcrews.ikea.item.ItemService;
 import no.jlwcrews.ikea.order.OrderRequestDTO;
 import org.springframework.stereotype.Service;
@@ -21,22 +23,37 @@ public class InventoryService {
         this.inventoryRepo = inventoryRepo;
     }
 
-    public List<Inventory> getAllInventory(){
+    public List<Inventory> getAllInventory() {
         return inventoryRepo.findAll();
     }
 
-    public Inventory getInventoryById(long id){
+    public Inventory getInventoryById(long id) {
         return inventoryRepo.findById(id).orElse(null);
     }
 
+    public Inventory getInventoryByItemId(long itemId) {
+        return inventoryRepo.findByItemId(itemId).orElse(null);
+    }
+
     @Transactional
-    public void placeOrder(OrderRequestDTO request){
-        var requirements = itemService.calculateRequirements(request.id(), request.qty());
-        requirements.forEach((itemId, quantity) -> {
-            var inventoryItem = inventoryRepo.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Item no exist"));
-            if(inventoryItem.getQuantityOnHand() < quantity) throw new InsufficientQuantityException("Insufficient quantity on hand of " + itemId);
-            inventoryItem.setQuantityOnReserve(quantity);
-            inventoryRepo.save(inventoryItem);
-        });
+    public void placeOrder(OrderRequestDTO request) {
+        var item = itemService.getItemById(request.id());
+        reserve(item, request.qty());
+    }
+
+    private void reserve(Item item, int needed) {
+        var inv = inventoryRepo.findByItemId(item.getId()).orElse(null);
+        int free = inv == null ? 0 : inv.getQuantityOnHand() - inv.getQuantityOnReserve();
+        int taken = Math.min(free, needed);
+        if (taken > 0) inv.setQuantityOnReserve(inv.getQuantityOnReserve() + taken);
+
+        int remaining = needed - taken;
+        if (remaining == 0) return;
+
+        if (item.getBom() == null)
+            throw new InsufficientQuantityException("Not enough " + item.getName() + ", short by " + remaining);
+
+        for (BomLine line : item.getBom().getBomLines())
+            reserve(line.getItem(), line.getQuantity() * remaining);
     }
 }
